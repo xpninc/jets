@@ -15,19 +15,21 @@ module Jets::CLI::Lambda
     end
 
     include Jets::AwsServices
+
     def initialize(name)
       @name = name
     end
 
     MAX_FUNCTION_NAME_SIZE = 64
+
     def function_name
       name = if @name.starts_with?(Jets.project.namespace)
-        @name # fully qualified function name
-      elsif !ENV["JETS_RESET"]
-        [Jets.project.namespace, @name].join("-")
-      else
-        lookup
-      end
+               @name # fully qualified function name
+             elsif !ENV["JETS_RESET"]
+               [Jets.project.namespace, @name].join("-")
+             else
+               lookup
+             end
       (name.size > MAX_FUNCTION_NAME_SIZE) ? lookup : name
     end
 
@@ -41,6 +43,8 @@ module Jets::CLI::Lambda
         parts = @name.split("-")
         meth = parts.pop.tr("-", "_").camelize
         class_name = parts.join("_").camelize
+
+        return [Jets::Names.parent_stack_name, @name].join('-')
       end
 
       parent_name = Jets::Names.parent_stack_name
@@ -61,6 +65,7 @@ module Jets::CLI::Lambda
       unless child
         raise Error::ChildStack, "Unable to find child stack #{parent_name}"
       end
+
       output = child.outputs.find { |o| o.output_key == "#{meth}LambdaFunction" }
       output.output_value
     end

@@ -31,7 +31,15 @@ module Jets::Event
         handle(event, context, meth)
       end
 
+      def on_lambda?
+        !!ENV['AWS_LAMBDA_FUNCTION_NAME']
+      end
+
       def handle_later(meth = :handle, event = {}, context = {})
+        if not on_lambda?
+          return handle(event, context, meth)
+        end
+
         function = "#{name.underscore}-#{meth}" # IE: "cool_event-handle"
         call = Jets::CLI::Call.new(
           function: function,
@@ -39,12 +47,12 @@ module Jets::Event
           invocation_type: "Event"
         )
         resp = begin
-          call.invoke
-        rescue Jets::CLI::Call::Error => e
-          puts "ERROR: #{e.message}".color(:red)
-          puts "The stack may not be full deployed yet.  Please check the stack and try again."
-          return
-        end
+                 call.invoke
+               rescue Jets::CLI::Call::Error => e
+                 puts "ERROR: #{e.message}".color(:red)
+                 puts "The stack may not be full deployed yet.  Please check the stack and try again."
+                 return
+               end
         unless resp.status_code == 202
           raise Error, "Error calling Lambda function #{function} with invocation_type Event. status code: #{resp.status_code}"
         end
