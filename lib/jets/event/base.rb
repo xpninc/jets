@@ -53,6 +53,7 @@ module Jets::Event
                  puts "The stack may not be full deployed yet.  Please check the stack and try again."
                  return
                end
+        p resp
         unless resp.status_code == 202
           raise Error, "Error calling Lambda function #{function} with invocation_type Event. status code: #{resp.status_code}"
         end

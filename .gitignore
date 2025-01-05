@@ -26,3 +26,5 @@ spec/fixtures/demo/dynamodb/migrate
 spec/fixtures/demo/public/assets
 spec/fixtures/project/handlers
 yarn.lock
+.idea/
+.DS_Store

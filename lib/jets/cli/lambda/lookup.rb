@@ -30,6 +30,8 @@ module Jets::CLI::Lambda
              else
                lookup
              end
+      p "Calling: #{name}"
+
       (name.size > MAX_FUNCTION_NAME_SIZE) ? lookup : name
     end
 
